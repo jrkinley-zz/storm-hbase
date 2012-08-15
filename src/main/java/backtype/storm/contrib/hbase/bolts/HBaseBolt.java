@@ -1,0 +1,95 @@
+package backtype.storm.contrib.hbase.bolts;
+
+import java.io.IOException;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import backtype.storm.contrib.hbase.utils.HTableConnector;
+import backtype.storm.contrib.hbase.utils.TupleTableConfig;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.IRichBolt;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.tuple.Tuple;
+
+/**
+ * A Storm bolt for putting data into HBase.
+ * <p>
+ * By default works in batch mode by enabling HBase's client-side write buffer.
+ * Enabling batch mode is recommended for high throughput, but it can be
+ * disabled in {@link TupleTableConfig}.
+ * 
+ * @see TupleTableConfig
+ * @see HTableConnector
+ */
+@SuppressWarnings("serial")
+public class HBaseBolt implements IRichBolt {
+  private static final Logger LOG = Logger.getLogger(HBaseBolt.class);
+
+  private OutputCollector collector;
+  private HTableConnector connector;
+  private TupleTableConfig conf;
+  private boolean autoAck = true;
+
+  public HBaseBolt(TupleTableConfig conf) throws IOException {
+    this.conf = conf;
+    this.connector = new HTableConnector(conf.getTableName(), conf.isBatch());
+  }
+
+  /** {@inheritDoc} */
+  @SuppressWarnings("rawtypes")
+  @Override
+  public void prepare(Map stormConf, TopologyContext context,
+      OutputCollector collector) {
+    this.collector = collector;
+
+    LOG.info("Preparing HBaseBasicBolt for table: " + this.conf.getTableName());
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void execute(Tuple input) {
+    try {
+      this.connector.put(conf.getPutFromTuple(input));
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+
+    if (this.autoAck) {
+      this.collector.ack(input);
+    }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void cleanup() {
+    this.connector.close();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void declareOutputFields(OutputFieldsDeclarer declarer) {
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Map<String, Object> getComponentConfiguration() {
+    return null;
+  }
+
+  /**
+   * @return the autoAck
+   */
+  public boolean isAutoAck() {
+    return autoAck;
+  }
+
+  /**
+   * @param autoAck
+   *          the autoAck to set
+   */
+  public void setAutoAck(boolean autoAck) {
+    this.autoAck = autoAck;
+  }
+}
