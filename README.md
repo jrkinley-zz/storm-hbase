@@ -5,9 +5,9 @@ This is a HBase connector for Storm (https://github.com/nathanmarz/storm/).
 
 It provides two Bolt implementations:
 
-* HBaseBolt: A bolt for transforming Tuples into Put requests and sending them to a HBase table. Works in both single and batch mode. In single mode each Put is sent straight to HBase and therefore requires a RPC for each. In batch mode HBase's client-side buffer is enabled which buffers Put requests until it is full, at which point all of the Puts are flushed to HBase in a single RPC. Batch mode is enabled by default and is recommended for high throughput streams.
+* <b>HBaseBolt</b>: A bolt for transforming Tuples into Put requests and sending them to a HBase table. Works in both single and batch mode. In single mode each Put is sent straight to HBase and therefore requires a RPC for each. In batch mode HBase's client-side buffer is enabled which buffers Put requests until it is full, at which point all of the Puts are flushed to HBase in a single RPC. Batch mode is enabled by default and is recommended for high throughput streams.
 
-* HBaseCountersBolt: An extension to HBaseBolt which transforms Tuples into HBase counter Increment requests. This is useful for storm topologies that collect statistics.
+* <b>HBaseCountersBolt</b>: An extension to HBaseBolt which transforms Tuples into HBase counter Increment requests. This is useful for storm topologies that collect statistics.
 
 Both implementations are generic and configurable. The TupleTableConfig class is used to configure the Bolts by storing the following configurable attributes:
 
@@ -33,18 +33,20 @@ And the TupleTableConfig configuration:
 
 You will get the following counter in your HBase table:
 
-	ROW				CF	CQ		COUNTER
+	ROW					CF		CQ			COUNTER
 	http://bit.ly/LsaBa	data	20120816	3
 
 However, if you specify a CQ in the configuration that doesn't exist in the Tuple, for example 'clicks', the given CQ name is used for the counter:
 
-	ROW				CF	CQ		COUNTER
+	ROW					CF		CQ		COUNTER
 	http://bit.ly/LsaBa	data	clicks	3
 
 Build
 -------------
 
 	$ mvn install
+
+---------------------------------------
 
 Running the example topologies
 -------------
@@ -62,12 +64,12 @@ Create the HBase table (assumes you have HBase installed and configured)
 
 Both topologies use the same Spout, which outputs at random one of the following tuples:
 	
-	shorturl				url						name		date
+	shorturl					url								name		date
 	"http://bit.ly/ZK6t"		"www.arsenal.com/home"			"kinley"	"20120816"
 	"http://bit.ly/LsaBa"		"www.baltimoreravens.com/"		"kinley"	"20120816"
 	"http://bit.ly/2VL7eA"		"www.49ers.com/"				"kinley"	"20120816"
 	"http://bit.ly/9ZJhuY"		"www.buccaneers.com/index.html"	"kinley"	"20120816"
-	"http://atmlb.com/7NG4sm"	"baltimore.orioles.mlb.com/"		"kinley"	"20120816"
+	"http://atmlb.com/7NG4sm"	"baltimore.orioles.mlb.com/"	"kinley"	"20120816"
 
 ### Running the Put example
 
@@ -85,7 +87,7 @@ With the following TupleTableConfig configuration:
 
 Your 'shorturl' table should look something like this:
 
-	ROW					COLUMN+CELL                                                                                                                                                                                          
+	ROW							COLUMN+CELL                                                                                                                                                                                          
  	http://atmlb.com/7NG4sm		column=data:date, timestamp=1345115796927, value=20120816                                                                                              
 	http://atmlb.com/7NG4sm		column=data:url, timestamp=1345115796927, value=baltimore.orioles.mlb.com/                                                                             
 	http://atmlb.com/7NG4sm		column=data:user, timestamp=1345115796927, value=kinley                                                                                                                                                        
@@ -95,12 +97,12 @@ Your 'shorturl' table should look something like this:
 	http://bit.ly/9ZJhuY		column=data:date, timestamp=1345115796937, value=20120816                                                                                              
 	http://bit.ly/9ZJhuY		column=data:url, timestamp=1345115796937, value=www.buccaneers.com/index.html                                                                          
 	http://bit.ly/9ZJhuY		column=data:user, timestamp=1345115796937, value=kinley                                                                                                
-	http://bit.ly/LsaBa		column=data:date, timestamp=1345115796929, value=20120816                                                                                              
-	http://bit.ly/LsaBa		column=data:url, timestamp=1345115796929, value=www.baltimoreravens.com/                                                                               
-	http://bit.ly/LsaBa		column=data:user, timestamp=1345115796929, value=kinley                                                                                                
-	http://bit.ly/ZK6t		column=data:date, timestamp=1345115796930, value=20120816                                                                                              
-	http://bit.ly/ZK6t		column=data:url, timestamp=1345115796930, value=www.arsenal.com/home                                                                                   
-	http://bit.ly/ZK6t		column=data:user, timestamp=1345115796930, value=kinley
+	http://bit.ly/LsaBa			column=data:date, timestamp=1345115796929, value=20120816                                                                                              
+	http://bit.ly/LsaBa			column=data:url, timestamp=1345115796929, value=www.baltimoreravens.com/                                                                               
+	http://bit.ly/LsaBa			column=data:user, timestamp=1345115796929, value=kinley                                                                                                
+	http://bit.ly/ZK6t			column=data:date, timestamp=1345115796930, value=20120816                                                                                              
+	http://bit.ly/ZK6t			column=data:url, timestamp=1345115796930, value=www.arsenal.com/home                                                                                   
+	http://bit.ly/ZK6t			column=data:user, timestamp=1345115796930, value=kinley
 
 ### Running the Increment example
 
@@ -117,16 +119,17 @@ With the following TupleTableConfig configuration:
 
 Your 'shorturl' table should look something like this:
 
+	ROW							COLUMN+CELL
 	http://atmlb.com/7NG4sm		column=daily:20120816, timestamp=1345115849682, value=\x00\x00\x00\x00\x00\x00\x05\x8C                                                                 
 	http://atmlb.com/7NG4sm		column=data:clicks, timestamp=1345115849682, value=\x00\x00\x00\x00\x00\x00\x05\x8C   
 	http://bit.ly/2VL7eA		column=daily:20120816, timestamp=1345115849679, value=\x00\x00\x00\x00\x00\x00\x05\xA1                                                                 
  	http://bit.ly/2VL7eA		column=data:clicks, timestamp=1345115849679, value=\x00\x00\x00\x00\x00\x00\x05\xA1  
 	http://bit.ly/9ZJhuY		column=daily:20120816, timestamp=1345115849665, value=\x00\x00\x00\x00\x00\x00\x05\xFC                                                                 
 	http://bit.ly/9ZJhuY		column=data:clicks, timestamp=1345115849665, value=\x00\x00\x00\x00\x00\x00\x05\xFC  
-	http://bit.ly/LsaBa		column=daily:20120816, timestamp=1345115849674, value=\x00\x00\x00\x00\x00\x00\x05\x94                                                                 
-	http://bit.ly/LsaBa		column=data:clicks, timestamp=1345115849674, value=\x00\x00\x00\x00\x00\x00\x05\x94
-	http://bit.ly/ZK6t		column=daily:20120816, timestamp=1345115849678, value=\x00\x00\x00\x00\x00\x00\x05v                                                                    
-	http://bit.ly/ZK6t		column=data:clicks, timestamp=1345115849678, value=\x00\x00\x00\x00\x00\x00\x05v
+	http://bit.ly/LsaBa			column=daily:20120816, timestamp=1345115849674, value=\x00\x00\x00\x00\x00\x00\x05\x94                                                                 
+	http://bit.ly/LsaBa			column=data:clicks, timestamp=1345115849674, value=\x00\x00\x00\x00\x00\x00\x05\x94
+	http://bit.ly/ZK6t			column=daily:20120816, timestamp=1345115849678, value=\x00\x00\x00\x00\x00\x00\x05v                                                                    
+	http://bit.ly/ZK6t			column=data:clicks, timestamp=1345115849678, value=\x00\x00\x00\x00\x00\x00\x05v
 
 To see the counter value, run the following in the HBase shell:
 
