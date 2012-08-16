@@ -27,14 +27,13 @@ import backtype.storm.tuple.Tuple;
 public class HBaseBolt implements IRichBolt {
   private static final Logger LOG = Logger.getLogger(HBaseBolt.class);
 
-  private OutputCollector collector;
-  private HTableConnector connector;
-  private TupleTableConfig conf;
-  private boolean autoAck = true;
+  protected OutputCollector collector;
+  protected HTableConnector connector;
+  protected TupleTableConfig conf;
+  protected boolean autoAck = true;
 
-  public HBaseBolt(TupleTableConfig conf) throws IOException {
+  public HBaseBolt(TupleTableConfig conf) {
     this.conf = conf;
-    this.connector = new HTableConnector(conf.getTableName(), conf.isBatch());
   }
 
   /** {@inheritDoc} */
@@ -44,7 +43,13 @@ public class HBaseBolt implements IRichBolt {
       OutputCollector collector) {
     this.collector = collector;
 
-    LOG.info("Preparing HBaseBasicBolt for table: " + this.conf.getTableName());
+    try {
+      this.connector = new HTableConnector(conf.getTableName(), conf.isBatch());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    LOG.info("Preparing HBaseBolt for table: " + this.conf.getTableName());
   }
 
   /** {@inheritDoc} */

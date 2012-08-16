@@ -1,17 +1,20 @@
 package backtype.storm.contrib.hbase.utils;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.log4j.Logger;
 
 /**
  * HTable connector for storm bolt
  */
-public class HTableConnector {
+@SuppressWarnings("serial")
+public class HTableConnector implements Serializable {
   private static final Logger LOG = Logger.getLogger(HTableConnector.class);
 
   private Configuration conf;
@@ -38,6 +41,9 @@ public class HTableConnector {
     this.conf = HBaseConfiguration.create();
     this.isBatch = batch;
 
+    LOG.info(String.format("Initializing connection to HBase table %s at %s",
+        tableName, this.conf.get("hbase.rootdir")));
+
     try {
       this.table = new HTable(this.conf, tableName);
     } catch (IOException ex) {
@@ -63,6 +69,16 @@ public class HTableConnector {
    */
   public void put(Put put) throws IOException {
     this.table.put(put);
+  }
+
+  /**
+   * Increments one or more columns within a single row
+   * 
+   * @param increment
+   * @throws IOException
+   */
+  public void increment(Increment increment) throws IOException {
+    this.table.increment(increment);
   }
 
   /**

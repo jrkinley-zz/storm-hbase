@@ -37,7 +37,6 @@
 	</repositories>
 
 	<properties>
-		<spring.version>2.5.6</spring.version>
 		<storm.version>0.8.0</storm.version>
 		<hbase.version>0.92.1-cdh4.0.1</hbase.version>
 		<hadoop.version>2.0.0-cdh4.0.1</hadoop.version>
@@ -48,24 +47,21 @@
 			<groupId>storm</groupId>
 			<artifactId>storm</artifactId>
 			<version>${storm.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hbase</groupId>
 			<artifactId>hbase</artifactId>
 			<version>${hbase.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-common</artifactId>
 			<version>${hadoop.version}</version>
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
 		</dependency>
 	</dependencies>
 
@@ -80,7 +76,28 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<descriptor>src/main/assembly/jar-with-dependencies.xml</descriptor>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.6.3</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.zookeeper</groupId>
+				<artifactId>zookeeper</artifactId>
+				<version>3.3.3</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
