@@ -31,6 +31,13 @@ public class HBaseCountersExampleTopology {
     // Build TupleTableConifg
     TupleTableConfig config = new TupleTableConfig("shorturl", "shortid");
     config.setBatch(false);
+    /*
+     * By default the HBaseCountersBolt will use the tuple output fields value
+     * to set the CQ name. For example the 'date' output field exists in the
+     * tuple and its value (e.g. "YYYYMMDD") will be used to set the counters
+     * CQ. However, the 'clicks' output field does not exist in the tuple and in
+     * this case the counters CQ will be set to the given name 'clicks'.
+     */
     config.addColumn("data", "clicks");
     config.addColumn("daily", "date");
 
