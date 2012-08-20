@@ -7,7 +7,7 @@ It provides two Bolt implementations:
 
 * <b>HBaseBolt</b>: A bolt for transforming Tuples into Put requests and sending them to a HBase table. Works in both single and batch mode. In single mode each Put is sent straight to HBase and therefore requires a RPC for each. In batch mode HBase's client-side buffer is enabled which buffers Put requests until it is full, at which point all of the Puts are flushed to HBase in a single RPC. Batch mode is enabled by default and is recommended for high throughput streams.
 
-* <b>HBaseCountersBolt</b>: An extension to HBaseBolt which transforms Tuples into HBase counter Increment requests. This is useful for storm topologies that collect statistics.
+* <b>HBaseCountersBolt</b>: An extension to HBaseBolt which transforms Tuples into HBase counter Increment requests. This is useful for storm topologies that collect statistics. Please note that this is a non-transactional bolt. Based on Storm's guaranteed message processing mechanism there is a chance of over-counting if tuples fail after updating the HBase counter and before they are successfully acked and are replayed.
 
 Both implementations are generic and configurable. The TupleTableConfig class is used to configure the Bolts by storing the following configurable attributes:
 
@@ -138,3 +138,10 @@ To see the counter value, run the following in the HBase shell:
 
 	$ get_counter 'shorturl', 'http://atmlb.com/7NG4sm', 'data:clicks'
 	COUNTER VALUE = 1420
+	
+---------------------------------------
+
+Coming soon
+-------------
+
+* <b>HBaseCountersBatchBolt</b>: Another version of HBaseCountersBolt but for transactional topologies. This will be a committing batch bolt that will store transaction state alongside the counter in HBase to avoid over-counting due to failed, and subsequently replayed batches of tuples. See https://github.com/nathanmarz/storm/wiki/Transactional-topologies for more information on transactional topologies.
