@@ -7,14 +7,16 @@ It provides two Bolt implementations:
 
 * <b>HBaseBolt</b>: A bolt for transforming Tuples into Put requests and sending them to a HBase table. Works in both single and batch mode. In single mode each Put is sent straight to HBase and therefore requires a RPC for each. In batch mode HBase's client-side buffer is enabled which buffers Put requests until it is full, at which point all of the Puts are flushed to HBase in a single RPC. Batch mode is enabled by default and is recommended for high throughput streams.
 
-* <b>HBaseCountersBolt</b>: An extension to HBaseBolt which transforms Tuples into HBase counter Increment requests. This is useful for storm topologies that collect statistics. Please note that this is a non-transactional bolt. Based on Storm's guaranteed message processing mechanism there is a chance of over-counting if tuples fail after updating the HBase counter and before they are successfully acked and are replayed.
+* <b>HBaseCountersBolt</b>: An extension to HBaseBolt which transforms Tuples into HBase counter Increment requests. This is useful for storm topologies that collect statistics. Please note that this is a non-transactional bolt. Based on Storm's guaranteed message processing mechanism there is a chance of over-counting if Tuples fail after updating the HBase counter and before they are successfully acked and are subsequently replayed.
 
 Both implementations are generic and configurable. The TupleTableConfig class is used to configure the Bolts by storing the following configurable attributes:
 
-* HBase table name
+* HBase table name to connect to
 * The Tuple field to be used as the row key
 * The Tuple field to be used as the rows timestamp (optional)
-* Whether to enable HBase's client-side write buffer (batch mode)
+* Whether to enable HBase's client-side write buffer (batch mode) (enabled by default)
+* The size of the client-side write buffer (optional) (overrides value in hbase-site.xml, 2097152 bytes by default)
+* Whether to write to HBase's edit log (WAL) (enabled by default)
 * A map of column families to column qualifiers. The column qualifier names should correspond to the Tuple field names to be put into the table
 
 Counters

@@ -8,10 +8,14 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 
 /**
- * HTable connector for storm bolt
+ * HTable connector for Storm {@link Bolt}
+ * <p>
+ * The HBase configuration is picked up from the first <tt>hbase-site.xml</tt>
+ * encountered in the classpath
  */
 @SuppressWarnings("serial")
 public class HTableConnector implements Serializable {
@@ -20,42 +24,70 @@ public class HTableConnector implements Serializable {
   private Configuration conf;
   protected HTable table;
   private String tableName;
-  private boolean isBatch;
 
   /**
    * Initialize HTable connection
    * 
-   * @param tableName
-   *          The HBase table name
-   * @param batch
-   *          Whether to enable HBase's client-side write buffer. When enabled
-   *          your bolt will store put operations locally until the write buffer
-   *          is full, so they can be sent to HBase in a single RPC call. When
-   *          disabled each put operation is effectively an RPC and is sent
-   *          straight to HBase. As your bolt can process thousands of values
-   *          per second it is recommended that the write buffer is enabled.
+   * @param conf
+   *          The {@link TupleTableConfig}
    * @throws IOException
    */
-  public HTableConnector(String tableName, boolean batch) throws IOException {
-    this.tableName = tableName;
+  public HTableConnector(final TupleTableConfig conf) throws IOException {
+    this.tableName = conf.getTableName();
     this.conf = HBaseConfiguration.create();
-    this.isBatch = batch;
 
     LOG.info(String.format("Initializing connection to HBase table %s at %s",
         tableName, this.conf.get("hbase.rootdir")));
 
     try {
-      this.table = new HTable(this.conf, tableName);
+      this.table = new HTable(this.conf, this.tableName);
     } catch (IOException ex) {
       throw new IOException("Unable to establish connection to HBase table "
-          + tableName, ex);
+          + this.tableName, ex);
     }
 
-    if (batch) {
+    if (conf.isBatch()) {
       // Enable client-side write buffer
       this.table.setAutoFlush(false, true);
-      LOG.info("Batch mode enabled");
+      LOG.info("Enabled client-side write buffer");
     }
+
+    // If set, override write buffer size
+    if (conf.getWriteBufferSize() > 0) {
+      try {
+        this.table.setWriteBufferSize(conf.getWriteBufferSize());
+
+        LOG.info("Setting client-side write buffer to "
+            + conf.getWriteBufferSize());
+      } catch (IOException ex) {
+        LOG.error(
+            "Unable to set client-side write buffer size for HBase table "
+                + this.tableName, ex);
+      }
+    }
+
+    // Check the configured column families exist
+    for (String cf : conf.getColumnFamilies()) {
+      if (!columnFamilyExists(cf)) {
+        throw new RuntimeException(String.format(
+            "HBase table '%s' does not have column family '%s'",
+            conf.getTableName(), cf));
+      }
+    }
+  }
+
+  /**
+   * Checks to see if table contains the given column family
+   * 
+   * @param columnFamily
+   *          The column family name
+   * @return boolean
+   * @throws IOException
+   */
+  private boolean columnFamilyExists(final String columnFamily)
+      throws IOException {
+    return this.table.getTableDescriptor().hasFamily(
+        Bytes.toBytes(columnFamily));
   }
 
   /**
@@ -67,7 +99,7 @@ public class HTableConnector implements Serializable {
    * @param put
    * @throws IOException
    */
-  public void put(Put put) throws IOException {
+  public void put(final Put put) throws IOException {
     this.table.put(put);
   }
 
@@ -77,7 +109,7 @@ public class HTableConnector implements Serializable {
    * @param increment
    * @throws IOException
    */
-  public void increment(Increment increment) throws IOException {
+  public void increment(final Increment increment) throws IOException {
     this.table.increment(increment);
   }
 
@@ -103,37 +135,5 @@ public class HTableConnector implements Serializable {
     } catch (IOException ex) {
       LOG.error("Unable to close connection to HBase table " + tableName, ex);
     }
-  }
-
-  /**
-   * Set the client-side write buffer size for this HTable.
-   * <p>
-   * By default the write buffer size is 2 MB. If you are storing larger data,
-   * you may want to consider increasing this value to allow your bolt to
-   * efficiently group together a larger number of records per RPC
-   * <p>
-   * Calling this method overrides the write buffer size you have set in your
-   * hbase-site.xml e.g. <code>hbase.client.write.buffer</code>
-   * 
-   * @param writeBufferSize
-   *          The client-side write buffer size in bytes
-   */
-  public void setWriteBufferSize(long writeBufferSize) {
-    if (this.table != null) {
-      try {
-        this.table.setWriteBufferSize(writeBufferSize);
-      } catch (IOException ex) {
-        LOG.error(
-            "Unable to set client-side write buffer size for HBase table "
-                + tableName, ex);
-      }
-    }
-  }
-
-  /**
-   * @return the isBatch
-   */
-  public boolean isBatch() {
-    return isBatch;
   }
 }

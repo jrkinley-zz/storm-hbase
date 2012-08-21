@@ -19,6 +19,9 @@ import backtype.storm.tuple.Tuple;
  * By default works in batch mode by enabling HBase's client-side write buffer.
  * Enabling batch mode is recommended for high throughput, but it can be
  * disabled in {@link TupleTableConfig}.
+ * <p>
+ * The HBase configuration is picked up from the first <tt>hbase-site.xml</tt>
+ * encountered in the classpath
  * 
  * @see TupleTableConfig
  * @see HTableConnector
@@ -44,7 +47,7 @@ public class HBaseBolt implements IRichBolt {
     this.collector = collector;
 
     try {
-      this.connector = new HTableConnector(conf.getTableName(), conf.isBatch());
+      this.connector = new HTableConnector(conf);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

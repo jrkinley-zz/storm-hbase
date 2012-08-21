@@ -13,7 +13,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import backtype.storm.tuple.Tuple;
 
 /**
- * Configuration for Storm {@link Tuple} to HBase table mappings.
+ * Configuration for Storm {@link Tuple} to HBase serialization.
  */
 @SuppressWarnings("serial")
 public class TupleTableConfig implements Serializable {
@@ -22,6 +22,8 @@ public class TupleTableConfig implements Serializable {
   private String tupleTimestampField;
   private Map<String, Set<String>> columnFamilies;
   private boolean batch = true;
+  private boolean writeToWAL = true;
+  private long writeBufferSize = 0L;
 
   /**
    * Initialize configuration
@@ -64,7 +66,7 @@ public class TupleTableConfig implements Serializable {
    * @param columnQualifier
    *          The column qualifier name
    */
-  public void addColumn(final String columnFamily, String columnQualifier) {
+  public void addColumn(final String columnFamily, final String columnQualifier) {
     Set<String> columns = this.columnFamilies.get(columnFamily);
 
     if (columns == null) {
@@ -91,6 +93,7 @@ public class TupleTableConfig implements Serializable {
     }
 
     Put p = new Put(rowKey);
+    p.setWriteToWAL(writeToWAL);
 
     if (columnFamilies.size() > 0) {
       for (String cf : columnFamilies.keySet()) {
@@ -124,6 +127,7 @@ public class TupleTableConfig implements Serializable {
     byte[] rowKey = Bytes.toBytes(tuple.getStringByField(tupleRowKeyField));
 
     Increment inc = new Increment(rowKey);
+    inc.setWriteToWAL(writeToWAL);
 
     if (columnFamilies.size() > 0) {
       for (String cf : columnFamilies.keySet()) {
@@ -161,9 +165,59 @@ public class TupleTableConfig implements Serializable {
 
   /**
    * @param batch
-   *          Enable or disable batch mode
+   *          Whether to enable HBase's client-side write buffer. When enabled
+   *          your bolt will store put operations locally until the write buffer
+   *          is full, so they can be sent to HBase in a single RPC call. When
+   *          disabled each put operation is effectively an RPC and is sent
+   *          straight to HBase. As your bolt can process thousands of values
+   *          per second it is recommended that the write buffer is enabled.
+   *          <p>
+   *          Enabled by default
    */
   public void setBatch(boolean batch) {
     this.batch = batch;
+  }
+
+  /**
+   * @param writeToWAL
+   *          Sets whether to write to HBase's edit log. Setting to false will
+   *          mean fewer operations to perform when writing to HBase and hence
+   *          better performance, but changes that haven't been flushed to a
+   *          store file will be lost in the event of HBase failure
+   *          <p>
+   *          Enabled by default
+   */
+  public void setWriteToWAL(boolean writeToWAL) {
+    this.writeToWAL = writeToWAL;
+  }
+
+  /**
+   * @param writeBufferSize
+   *          Overrides the client-side write buffer size.
+   *          <p>
+   *          By default the write buffer size is 2 MB (2097152 bytes). If you
+   *          are storing larger data, you may want to consider increasing this
+   *          value to allow your bolt to efficiently group together a larger
+   *          number of records per RPC
+   *          <p>
+   *          Overrides the write buffer size you have set in your
+   *          hbase-site.xml e.g. <code>hbase.client.write.buffer</code>
+   */
+  public void setWriteBufferSize(long writeBufferSize) {
+    this.writeBufferSize = writeBufferSize;
+  }
+
+  /**
+   * @return the writeBufferSize
+   */
+  public long getWriteBufferSize() {
+    return writeBufferSize;
+  }
+
+  /**
+   * @return A Set of configured column families
+   */
+  public Set<String> getColumnFamilies() {
+    return this.columnFamilies.keySet();
   }
 }
