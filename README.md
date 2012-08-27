@@ -29,30 +29,30 @@ Counters
 
 By default <tt>HBaseCountersBolt</tt> and <tt>HBaseCountersBatchBolt</tt> use the Tuple field value to set the Increment request column qualifier name. For example, given the following Tuples:
 
-  Tuple1 = shorturl:http://bit.ly/LsaBa, date:20120816
-  Tuple2 = shorturl:http://bit.ly/LsaBa, date:20120816
-  Tuple3 = shorturl:http://bit.ly/LsaBa, date:20120816
+	Tuple1 = shorturl:http://bit.ly/LsaBa, date:20120816
+	Tuple2 = shorturl:http://bit.ly/LsaBa, date:20120816
+	Tuple3 = shorturl:http://bit.ly/LsaBa, date:20120816
 
 And the <tt>TupleTableConfig</tt> configuration:
 
-  Rowkey = "shorturl"
-  CF = "data", CQ = "date"
+	Rowkey = "shorturl"
+	CF = "data", CQ = "date"
 
 You will get the following counter in your HBase table:
 
-  ROW       CF  CQ    COUNTER
-  http://bit.ly/LsaBa data  20120816  3
+	ROW						CF		CQ			COUNTER
+	http://bit.ly/LsaBa		data	20120816	3
 
 However, if you specify a CQ in the configuration that doesn't exist in the Tuple, for example "clicks", the given CQ name is used for the counter:
 
-  ROW       CF  CQ    COUNTER
-  http://bit.ly/LsaBa data  clicks  3
+	ROW						CF		CQ		COUNTER
+	http://bit.ly/LsaBa		data	clicks	3
 
 
 Build
 -------------
 
-  $ mvn install
+	$ mvn install
 
 
 ---------------------------------------
@@ -68,125 +68,125 @@ The example topologies are based on the URL shortener project (Hush), taken from
 * <b><tt>HBaseCountersBatchTopology</tt></b>: A transactional topology that demonstrates how to use <tt>HBaseCounterBatchBolt</tt> to increment idempotent counters in HBase.
 
 To build a jar with all of the required dependencies for running the examples:
-  
-  $ mvn assembly:assembly
+
+	$ mvn assembly:assembly
 
 
 Create the HBase table (assumes you have HBase installed and configured):
 
-  create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}
+	create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}
 
 The <tt>HBaseExampleTopology</tt> and <tt>HBaseCountersExampleTopology</tt> topologies use the same Spout, which outputs at random one of the following Tuples:
   
-  shorturl        url             name    date
-  "http://bit.ly/ZK6t"    "www.arsenal.com/home"      "kinley"  "20120816"
-  "http://bit.ly/LsaBa" "www.baltimoreravens.com/"    "kinley"  "20120816"
-  "http://bit.ly/2VL7eA"  "www.49ers.com/"        "kinley"  "20120816"
-  "http://bit.ly/9ZJhuY"  "www.buccaneers.com/index.html" "kinley"  "20120816"
-  "http://atmlb.com/7NG4sm" "baltimore.orioles.mlb.com/"    "kinley"  "20120816"
+	shorturl					url								name		date
+	"http://bit.ly/ZK6t"		"www.arsenal.com/home"			"kinley"	"20120816"
+	"http://bit.ly/LsaBa"		"www.baltimoreravens.com/"		"kinley"	"20120816"
+	"http://bit.ly/2VL7eA"		"www.49ers.com/"				"kinley"	"20120816"
+	"http://bit.ly/9ZJhuY"		"www.buccaneers.com/index.html"	"kinley"	"20120816"
+	"http://atmlb.com/7NG4sm"	"baltimore.orioles.mlb.com/"	"kinley"	"20120816"
 
 The <tt>HBaseCountersBatchTopology</tt> uses the <tt>backtype.storm.testing.MemoryTransactionalSpout</tt> to output batches of the Tuples described above.
 
 
 ### Running <tt>HBaseExampleTopology</tt>
 
-  java -cp target/storm-hbase-[version]-jar-with-dependencies.jar:/path/to/hbase/conf backtype.storm.contrib.hbase.example.HBaseExampleTopology
+	java -cp target/storm-hbase-[version]-jar-with-dependencies.jar:/path/to/hbase/conf backtype.storm.contrib.hbase.example.HBaseExampleTopology
 
 The <tt>/path/to/hbase/conf</tt> directory should contain your <tt>hbase-site.xml</tt>
 
 With the following <tt>TupleTableConfig</tt> configuration:
 
-  TupleTableConfig config = new TupleTableConfig("shorturl", "shortid");
-  config.setBatch(false);
-  config.addColumn("data", "url");
-  config.addColumn("data", "user");
-  config.addColumn("data", "date");
+	TupleTableConfig config = new TupleTableConfig("shorturl", "shortid");
+	config.setBatch(false);
+	config.addColumn("data", "url");
+	config.addColumn("data", "user");
+	config.addColumn("data", "date");
 
 Your "shorturl" table should look something like this:
 
-  ROW           COLUMN+CELL
-  http://atmlb.com/7NG4sm   column=data:date, timestamp=1345115796927, value=20120816
-  http://atmlb.com/7NG4sm   column=data:url, timestamp=1345115796927, value=baltimore.orioles.mlb.com/
-  http://atmlb.com/7NG4sm   column=data:user, timestamp=1345115796927, value=kinley
-  http://bit.ly/2VL7eA      column=data:date, timestamp=1345115796935, value=20120816
-  http://bit.ly/2VL7eA      column=data:url, timestamp=1345115796935, value=www.49ers.com/
-  http://bit.ly/2VL7eA      column=data:user, timestamp=1345115796935, value=kinley
-  http://bit.ly/9ZJhuY      column=data:date, timestamp=1345115796937, value=20120816
-  http://bit.ly/9ZJhuY      column=data:url, timestamp=1345115796937, value=www.buccaneers.com/index.html
-  http://bit.ly/9ZJhuY      column=data:user, timestamp=1345115796937, value=kinley
-  http://bit.ly/LsaBa     column=data:date, timestamp=1345115796929, value=20120816
-  http://bit.ly/LsaBa     column=data:url, timestamp=1345115796929, value=www.baltimoreravens.com/
-  http://bit.ly/LsaBa     column=data:user, timestamp=1345115796929, value=kinley
-  http://bit.ly/ZK6t      column=data:date, timestamp=1345115796930, value=20120816
-  http://bit.ly/ZK6t      column=data:url, timestamp=1345115796930, value=www.arsenal.com/home
-  http://bit.ly/ZK6t      column=data:user, timestamp=1345115796930, value=kinley
+	ROW							COLUMN+CELL
+	http://atmlb.com/7NG4sm		column=data:date, timestamp=1345115796927, value=20120816
+	http://atmlb.com/7NG4sm		column=data:url, timestamp=1345115796927, value=baltimore.orioles.mlb.com/
+	http://atmlb.com/7NG4sm		column=data:user, timestamp=1345115796927, value=kinley
+	http://bit.ly/2VL7eA		column=data:date, timestamp=1345115796935, value=20120816
+	http://bit.ly/2VL7eA		column=data:url, timestamp=1345115796935, value=www.49ers.com/
+	http://bit.ly/2VL7eA		column=data:user, timestamp=1345115796935, value=kinley
+	http://bit.ly/9ZJhuY		column=data:date, timestamp=1345115796937, value=20120816
+	http://bit.ly/9ZJhuY		column=data:url, timestamp=1345115796937, value=www.buccaneers.com/index.html
+	http://bit.ly/9ZJhuY		column=data:user, timestamp=1345115796937, value=kinley
+	http://bit.ly/LsaBa			column=data:date, timestamp=1345115796929, value=20120816
+	http://bit.ly/LsaBa			column=data:url, timestamp=1345115796929, value=www.baltimoreravens.com/
+	http://bit.ly/LsaBa			column=data:user, timestamp=1345115796929, value=kinley
+	http://bit.ly/ZK6t			column=data:date, timestamp=1345115796930, value=20120816
+	http://bit.ly/ZK6t			column=data:url, timestamp=1345115796930, value=www.arsenal.com/home
+	http://bit.ly/ZK6t			column=data:user, timestamp=1345115796930, value=kinley
 
 
 ### Running <tt>HBaseCountersExampleTopology</tt>
 
-  java -cp target/storm-hbase-[version]-jar-with-dependencies.jar:/path/to/hbase/conf backtype.storm.contrib.hbase.example.HBaseCountersExampleTopology
+	java -cp target/storm-hbase-[version]-jar-with-dependencies.jar:/path/to/hbase/conf backtype.storm.contrib.hbase.example.HBaseCountersExampleTopology
 
 The <tt>/path/to/hbase/conf</tt> directory should contain your <tt>hbase-site.xml</tt>
 
 With the following <tt>TupleTableConfig</tt> configuration:
 
-  TupleTableConfig config = new TupleTableConfig("shorturl", "shortid");
-  config.setBatch(false);
-  config.addColumn("data", "clicks");
-  config.addColumn("daily", "date");
+	TupleTableConfig config = new TupleTableConfig("shorturl", "shortid");
+	config.setBatch(false);
+	config.addColumn("data", "clicks");
+	config.addColumn("daily", "date");
 
 Your "shorturl" table should look something like this:
 
-  ROW           COLUMN+CELL
-  http://atmlb.com/7NG4sm   column=daily:20120816, timestamp=1345115849682, value=\x00\x00\x00\x00\x00\x00\x05\x8C
-  http://atmlb.com/7NG4sm   column=data:clicks, timestamp=1345115849682, value=\x00\x00\x00\x00\x00\x00\x05\x8C
-  http://bit.ly/2VL7eA      column=daily:20120816, timestamp=1345115849679, value=\x00\x00\x00\x00\x00\x00\x05\xA1
-  http://bit.ly/2VL7eA      column=data:clicks, timestamp=1345115849679, value=\x00\x00\x00\x00\x00\x00\x05\xA1
-  http://bit.ly/9ZJhuY      column=daily:20120816, timestamp=1345115849665, value=\x00\x00\x00\x00\x00\x00\x05\xFC
-  http://bit.ly/9ZJhuY      column=data:clicks, timestamp=1345115849665, value=\x00\x00\x00\x00\x00\x00\x05\xFC
-  http://bit.ly/LsaBa     column=daily:20120816, timestamp=1345115849674, value=\x00\x00\x00\x00\x00\x00\x05\x94
-  http://bit.ly/LsaBa     column=data:clicks, timestamp=1345115849674, value=\x00\x00\x00\x00\x00\x00\x05\x94
-  http://bit.ly/ZK6t      column=daily:20120816, timestamp=1345115849678, value=\x00\x00\x00\x00\x00\x00\x05v
-  http://bit.ly/ZK6t      column=data:clicks, timestamp=1345115849678, value=\x00\x00\x00\x00\x00\x00\x05v
+	ROW							COLUMN+CELL
+	http://atmlb.com/7NG4sm		column=daily:20120816, timestamp=1345115849682, value=\x00\x00\x00\x00\x00\x00\x05\x8C
+	http://atmlb.com/7NG4sm		column=data:clicks, timestamp=1345115849682, value=\x00\x00\x00\x00\x00\x00\x05\x8C
+	http://bit.ly/2VL7eA		column=daily:20120816, timestamp=1345115849679, value=\x00\x00\x00\x00\x00\x00\x05\xA1
+	http://bit.ly/2VL7eA		column=data:clicks, timestamp=1345115849679, value=\x00\x00\x00\x00\x00\x00\x05\xA1
+	http://bit.ly/9ZJhuY		column=daily:20120816, timestamp=1345115849665, value=\x00\x00\x00\x00\x00\x00\x05\xFC
+	http://bit.ly/9ZJhuY		column=data:clicks, timestamp=1345115849665, value=\x00\x00\x00\x00\x00\x00\x05\xFC
+	http://bit.ly/LsaBa			column=daily:20120816, timestamp=1345115849674, value=\x00\x00\x00\x00\x00\x00\x05\x94
+	http://bit.ly/LsaBa			column=data:clicks, timestamp=1345115849674, value=\x00\x00\x00\x00\x00\x00\x05\x94
+	http://bit.ly/ZK6t			column=daily:20120816, timestamp=1345115849678, value=\x00\x00\x00\x00\x00\x00\x05v
+	http://bit.ly/ZK6t			column=data:clicks, timestamp=1345115849678, value=\x00\x00\x00\x00\x00\x00\x05v
 
 To see the counter value, run the following in the HBase shell:
 
-  $ get_counter 'shorturl', 'http://atmlb.com/7NG4sm', 'daily:20120816'
-  COUNTER VALUE = 1420
+	$ get_counter 'shorturl', 'http://atmlb.com/7NG4sm', 'daily:20120816'
+	COUNTER VALUE = 1420
 
-  $ get_counter 'shorturl', 'http://atmlb.com/7NG4sm', 'data:clicks'
-  COUNTER VALUE = 1420
+	$ get_counter 'shorturl', 'http://atmlb.com/7NG4sm', 'data:clicks'
+	COUNTER VALUE = 1420
 
 
 ### Running <tt>HBaseCountersBatchTopology</tt>
 
-  java -cp target/storm-hbase-[version]-jar-with-dependencies.jar:/path/to/hbase/conf backtype.storm.contrib.hbase.example.HBaseCountersBatchTopology
+	java -cp target/storm-hbase-[version]-jar-with-dependencies.jar:/path/to/hbase/conf backtype.storm.contrib.hbase.example.HBaseCountersBatchTopology
 
 The <tt>/path/to/hbase/conf</tt> directory should contain your <tt>hbase-site.xml</tt>
 
 With the following <tt>TupleTableConfig</tt> configuration:
 
-  TupleTableConfig config = new TupleTableConfig("shorturl", "shortid");
-  config.setBatch(false);
-  config.addColumn("data", "clicks");
-  config.addColumn("daily", "date");
+	TupleTableConfig config = new TupleTableConfig("shorturl", "shortid");
+	config.setBatch(false);
+	config.addColumn("data", "clicks");
+	config.addColumn("daily", "date");
 
 Your "shorturl" table should look something like this:
 
-  ROW           COLUMN+CELL
-  http://atmlb.com/7NG4sm   column=daily:20120816, timestamp=1345935584520, value=\x00\x00\x00\x00\x00\x00\x00\x01
-  http://atmlb.com/7NG4sm   column=daily:20120816_txid, timestamp=1345935584523, value=\x02
-  http://atmlb.com/7NG4sm   column=data:clicks, timestamp=1345935584528, value=\x00\x00\x00\x00\x00\x00\x00\x01
-  http://atmlb.com/7NG4sm   column=data:clicks_txid, timestamp=1345935584531, value=\x02
-  http://bit.ly/2VL7eA      column=daily:20120816, timestamp=1345935584434, value=\x00\x00\x00\x00\x00\x00\x00\x01
-  http://bit.ly/2VL7eA      column=daily:20120816_txid, timestamp=1345935584439, value=\x01
-  http://bit.ly/2VL7eA      column=data:clicks, timestamp=1345935584444, value=\x00\x00\x00\x00\x00\x00\x00\x01
-  http://bit.ly/2VL7eA      column=data:clicks_txid, timestamp=1345935584446, value=\x01
-  http://bit.ly/9ZJhuY      column=daily:20120816, timestamp=1345935584535, value=\x00\x00\x00\x00\x00\x00\x00\x01
-  http://bit.ly/9ZJhuY      column=daily:20120816_txid, timestamp=1345935584538, value=\x02
-  http://bit.ly/9ZJhuY      column=data:clicks, timestamp=1345935584542, value=\x00\x00\x00\x00\x00\x00\x00\x01
-  http://bit.ly/9ZJhuY      column=data:clicks_txid, timestamp=1345935584544, value=\x02
-  http://bit.ly/LsaBa     column=daily:20120816, timestamp=1345935584450, value=\x00\x00\x00\x00\x00\x00\x00\x04
+	ROW							COLUMN+CELL
+	http://atmlb.com/7NG4sm		column=daily:20120816, timestamp=1345935584520, value=\x00\x00\x00\x00\x00\x00\x00\x01
+	http://atmlb.com/7NG4sm		column=daily:20120816_txid, timestamp=1345935584523, value=\x02
+	http://atmlb.com/7NG4sm		column=data:clicks, timestamp=1345935584528, value=\x00\x00\x00\x00\x00\x00\x00\x01
+	http://atmlb.com/7NG4sm		column=data:clicks_txid, timestamp=1345935584531, value=\x02
+	http://bit.ly/2VL7eA		column=daily:20120816, timestamp=1345935584434, value=\x00\x00\x00\x00\x00\x00\x00\x01
+	http://bit.ly/2VL7eA		column=daily:20120816_txid, timestamp=1345935584439, value=\x01
+	http://bit.ly/2VL7eA		column=data:clicks, timestamp=1345935584444, value=\x00\x00\x00\x00\x00\x00\x00\x01
+	http://bit.ly/2VL7eA		column=data:clicks_txid, timestamp=1345935584446, value=\x01
+	http://bit.ly/9ZJhuY		column=daily:20120816, timestamp=1345935584535, value=\x00\x00\x00\x00\x00\x00\x00\x01
+	http://bit.ly/9ZJhuY		column=daily:20120816_txid, timestamp=1345935584538, value=\x02
+	http://bit.ly/9ZJhuY		column=data:clicks, timestamp=1345935584542, value=\x00\x00\x00\x00\x00\x00\x00\x01
+	http://bit.ly/9ZJhuY		column=data:clicks_txid, timestamp=1345935584544, value=\x02
+	http://bit.ly/LsaBa			column=daily:20120816, timestamp=1345935584450, value=\x00\x00\x00\x00\x00\x00\x00\x04
   http://bit.ly/LsaBa     column=daily:20120816_txid, timestamp=1345935584452, value=\x01
   http://bit.ly/LsaBa     column=data:clicks, timestamp=1345935584456, value=\x00\x00\x00\x00\x00\x00\x00\x04
   http://bit.ly/LsaBa     column=data:clicks_txid, timestamp=1345935584458, value=\x01
