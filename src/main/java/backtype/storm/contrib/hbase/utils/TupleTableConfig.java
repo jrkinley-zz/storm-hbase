@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
@@ -17,6 +19,9 @@ import backtype.storm.tuple.Tuple;
  */
 @SuppressWarnings("serial")
 public class TupleTableConfig implements Serializable {
+
+  public static final long DEFAULT_INCREMENT = 1L;
+
   private String tableName;
   private String tupleRowKeyField;
   private String tupleTimestampField;
@@ -150,6 +155,41 @@ public class TupleTableConfig implements Serializable {
   }
 
   /**
+   * Increment the counter for the given family and column by the specified
+   * amount
+   * <p>
+   * If the family and column already exist in the Increment the counter value
+   * is incremented by the specified amount rather than overridden, as it is in
+   * HBase's {@link Increment#addColumn(byte[], byte[], long)} method
+   * 
+   * @param inc
+   *          The {@link Increment} to update
+   * @param family
+   *          The column family
+   * @param qualifier
+   *          The column qualifier
+   * @param amount
+   *          The amount to increment the counter by
+   */
+  public static void addIncrement(Increment inc, final byte[] family,
+      final byte[] qualifier, final Long amount) {
+
+    NavigableMap<byte[], Long> set = inc.getFamilyMap().get(family);
+    if (set == null) {
+      set = new TreeMap<byte[], Long>(Bytes.BYTES_COMPARATOR);
+    }
+
+    // If qualifier exists, increment amount
+    Long counter = set.get(qualifier);
+    if (counter == null) {
+      counter = 0L;
+    }
+    set.put(qualifier, amount + counter);
+
+    inc.getFamilyMap().put(family, set);
+  }
+
+  /**
    * @return the tableName
    */
   public String getTableName() {
@@ -189,6 +229,13 @@ public class TupleTableConfig implements Serializable {
    */
   public void setWriteToWAL(boolean writeToWAL) {
     this.writeToWAL = writeToWAL;
+  }
+
+  /**
+   * @return True if write to HBase's edit log (WAL), false if not
+   */
+  public boolean isWriteToWAL() {
+    return writeToWAL;
   }
 
   /**

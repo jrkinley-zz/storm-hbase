@@ -1,4 +1,4 @@
-package backtype.storm.contrib.hbase.example;
+package backtype.storm.contrib.hbase.examples;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -8,14 +8,14 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.utils.Utils;
 
 /**
- * Example HBaseCountersBolt topology that increments the following counters in
- * the 'shorturl' table:
+ * An example non-transactional topology that uses the {@link HBaseCountersBolt}
+ * to increment the following counters in a HBase table:
  * <ul>
  * <li>cf:'data' cq:'clicks'
  * <li>cf:'daily' cq:'YYYYMMDD'
  * </ul>
- * Assumes the HBase table has been created. E.g.
- * "create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}"
+ * The example assumes that the following table exists in HBase:<br>
+ * <tt>create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}</tt>
  */
 public class HBaseCountersExampleTopology {
 

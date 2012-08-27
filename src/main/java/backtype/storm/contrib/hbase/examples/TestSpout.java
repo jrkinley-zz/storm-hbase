@@ -1,4 +1,4 @@
-package backtype.storm.contrib.hbase.example;
+package backtype.storm.contrib.hbase.examples;
 
 import java.util.ArrayList;
 import java.util.List;

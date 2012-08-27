@@ -6,10 +6,10 @@ import java.io.Serializable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Increment;
-import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
+
+import backtype.storm.generated.Bolt;
 
 /**
  * HTable connector for Storm {@link Bolt}
@@ -91,39 +91,10 @@ public class HTableConnector implements Serializable {
   }
 
   /**
-   * Put some data in the table
-   * <p>
-   * If batch mode is enabled, the update will be buffered until the buffer is
-   * full or {@link #flush()} is called
-   * 
-   * @param put
-   * @throws IOException
+   * @return the table
    */
-  public void put(final Put put) throws IOException {
-    this.table.put(put);
-  }
-
-  /**
-   * Increments one or more columns within a single row
-   * 
-   * @param increment
-   * @throws IOException
-   */
-  public void increment(final Increment increment) throws IOException {
-    this.table.increment(increment);
-  }
-
-  /**
-   * Explicitly flush the write buffer
-   * <p>
-   * Puts are automatically flushed when not in batch mode
-   */
-  public void flush() {
-    try {
-      this.table.flushCommits();
-    } catch (IOException ex) {
-      LOG.error("Unable to flush write buffer on HBase table " + tableName, ex);
-    }
+  public HTable getTable() {
+    return table;
   }
 
   /**

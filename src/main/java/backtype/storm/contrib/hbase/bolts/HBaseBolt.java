@@ -59,7 +59,7 @@ public class HBaseBolt implements IRichBolt {
   @Override
   public void execute(Tuple input) {
     try {
-      this.connector.put(conf.getPutFromTuple(input));
+      this.connector.getTable().put(conf.getPutFromTuple(input));
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }

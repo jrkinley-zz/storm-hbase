@@ -18,8 +18,6 @@ import backtype.storm.tuple.Tuple;
 @SuppressWarnings("serial")
 public class HBaseCountersBolt extends HBaseBolt {
 
-  private static final long DEFAULT_INCREMENT = 1L;
-
   public HBaseCountersBolt(TupleTableConfig conf) {
     super(conf);
   }
@@ -28,8 +26,8 @@ public class HBaseCountersBolt extends HBaseBolt {
   @Override
   public void execute(Tuple input) {
     try {
-      this.connector.increment(conf.getIncrementFromTuple(input,
-          DEFAULT_INCREMENT));
+      this.connector.getTable().increment(conf.getIncrementFromTuple(input,
+          TupleTableConfig.DEFAULT_INCREMENT));
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }

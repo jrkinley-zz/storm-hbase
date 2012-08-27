@@ -1,4 +1,4 @@
-package backtype.storm.contrib.hbase.example;
+package backtype.storm.contrib.hbase.examples;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -8,11 +8,11 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.utils.Utils;
 
 /**
- * Example HBaseBolt topology that inserts a stream of shortened URL's into the
- * 'data' column family of the 'shorturl' table
+ * An example non-transactional topology that uses the {@link HBaseBolt} to
+ * insert a stream of shortened URL's into a HBase table called 'shorturl'.
  * <p>
- * Assumes the HBase table has been created. E.g.
- * "create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}"
+ * Assumes the HBase table has been created.<br>
+ * <tt>create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}</tt>
  */
 public class HBaseExampleTopology {
 
