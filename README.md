@@ -187,10 +187,10 @@ Your "shorturl" table should look something like this:
 	http://bit.ly/9ZJhuY		column=data:clicks, timestamp=1345935584542, value=\x00\x00\x00\x00\x00\x00\x00\x01
 	http://bit.ly/9ZJhuY		column=data:clicks_txid, timestamp=1345935584544, value=\x02
 	http://bit.ly/LsaBa			column=daily:20120816, timestamp=1345935584450, value=\x00\x00\x00\x00\x00\x00\x00\x04
-  http://bit.ly/LsaBa     column=daily:20120816_txid, timestamp=1345935584452, value=\x01
-  http://bit.ly/LsaBa     column=data:clicks, timestamp=1345935584456, value=\x00\x00\x00\x00\x00\x00\x00\x04
-  http://bit.ly/LsaBa     column=data:clicks_txid, timestamp=1345935584458, value=\x01
-  http://bit.ly/ZK6t      column=daily:20120816, timestamp=1345935584462, value=\x00\x00\x00\x00\x00\x00\x00\x04
-  http://bit.ly/ZK6t      column=daily:20120816_txid, timestamp=1345935584465, value=\x01
-  http://bit.ly/ZK6t      column=data:clicks, timestamp=1345935584469, value=\x00\x00\x00\x00\x00\x00\x00\x04
-  http://bit.ly/ZK6t      column=data:clicks_txid, timestamp=1345935584471, value=\x01
+	http://bit.ly/LsaBa			column=daily:20120816_txid, timestamp=1345935584452, value=\x01
+	http://bit.ly/LsaBa			column=data:clicks, timestamp=1345935584456, value=\x00\x00\x00\x00\x00\x00\x00\x04
+	http://bit.ly/LsaBa			column=data:clicks_txid, timestamp=1345935584458, value=\x01
+	http://bit.ly/ZK6t			column=daily:20120816, timestamp=1345935584462, value=\x00\x00\x00\x00\x00\x00\x00\x04
+	http://bit.ly/ZK6t			column=daily:20120816_txid, timestamp=1345935584465, value=\x01
+	http://bit.ly/ZK6t			column=data:clicks, timestamp=1345935584469, value=\x00\x00\x00\x00\x00\x00\x00\x04
+	http://bit.ly/ZK6t			column=data:clicks_txid, timestamp=1345935584471, value=\x01
