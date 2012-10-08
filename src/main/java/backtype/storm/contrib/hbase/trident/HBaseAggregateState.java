@@ -129,6 +129,7 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
 
     try {
       connector.getTable().put(puts);
+      connector.getTable().flushCommits();
     } catch (IOException e) {
       new RuntimeException(e);
     }

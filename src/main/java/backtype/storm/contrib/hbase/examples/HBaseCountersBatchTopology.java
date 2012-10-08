@@ -77,7 +77,7 @@ public class HBaseCountersBatchTopology {
     cluster.submitTopology("hbase-example", stormConfig,
         builder.buildTopology());
 
-    Thread.sleep(3000);
+    Thread.sleep(10000);
     cluster.shutdown();
   }
 

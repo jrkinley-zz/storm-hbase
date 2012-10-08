@@ -54,6 +54,7 @@ public class HBaseValueState implements State {
   public void setValuesBulk(final List<Put> puts) {
     try {
       _connector.getTable().put(puts);
+      _connector.getTable().flushCommits();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
