@@ -17,8 +17,7 @@ import backtype.storm.utils.Utils;
  * The example assumes that the following table exists in HBase:<br>
  * <tt>create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}</tt>
  */
-public class HBaseCountersExampleTopology {
-
+public class HBaseCountersTopology {
   /**
    * @param args
    */
@@ -33,10 +32,10 @@ public class HBaseCountersExampleTopology {
     config.setBatch(false);
     /*
      * By default the HBaseCountersBolt will use the tuple output fields value
-     * to set the CQ name. For example the 'date' output field exists in the
-     * tuple and its value (e.g. "YYYYMMDD") will be used to set the counters
-     * CQ. However, the 'clicks' output field does not exist in the tuple and in
-     * this case the counters CQ will be set to the given name 'clicks'.
+     * to set the CQ name. For example if the 'date' output field exists in the
+     * tuple then its value (e.g. "YYYYMMDD") will be used to set the counters
+     * CQ. However, the 'clicks' output field does not exist in the tuple so in
+     * this case the counters CQ will be set to the given field name 'clicks'.
      */
     config.addColumn("data", "clicks");
     config.addColumn("daily", "date");

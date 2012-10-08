@@ -26,9 +26,8 @@ import backtype.storm.tuple.Values;
  * <tt>create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}</tt>
  */
 public class HBaseCountersBatchTopology {
-
   @SuppressWarnings("serial")
-  final static Map<Integer, List<List<Object>>> values = new HashMap<Integer, List<List<Object>>>() {{
+  protected final static Map<Integer, List<List<Object>>> values = new HashMap<Integer, List<List<Object>>>() {{
     put(0, new ArrayList<List<Object>>() {{
       add(new Values("http://bit.ly/ZK6t", "www.arsenal.com/home", "kinley", "20120816"));
       add(new Values("http://bit.ly/LsaBa", "www.baltimoreravens.com/", "kinley", "20120816"));
@@ -37,14 +36,14 @@ public class HBaseCountersBatchTopology {
       add(new Values("http://atmlb.com/7NG4sm", "baltimore.orioles.mlb.com/", "kinley", "20120816"));
     }});
     put(1, new ArrayList<List<Object>>() {{
-      add(new Values("http://bit.ly/ZK6t", "www.arsenal.com/home", "kinley", "20120816"));
-      add(new Values("http://bit.ly/ZK6t", "www.arsenal.com/home", "kinley", "20120816"));
-      add(new Values("http://bit.ly/ZK6t", "www.arsenal.com/home", "kinley", "20120816"));
+      add(new Values("http://bit.ly/ZK6t", "www.arsenal.com/home", "kinley", "20120817"));
+      add(new Values("http://bit.ly/ZK6t", "www.arsenal.com/home", "kinley", "20120817"));
+      add(new Values("http://bit.ly/ZK6t", "www.arsenal.com/home", "kinley", "20120817"));
     }});
     put(2, new ArrayList<List<Object>>() {{
-      add(new Values("http://bit.ly/LsaBa", "www.baltimoreravens.com/", "kinley", "20120816"));
-      add(new Values("http://bit.ly/LsaBa", "www.baltimoreravens.com/", "kinley", "20120816"));
-      add(new Values("http://bit.ly/LsaBa", "www.baltimoreravens.com/", "kinley", "20120816"));
+      add(new Values("http://bit.ly/LsaBa", "www.baltimoreravens.com/", "kinley", "20120820"));
+      add(new Values("http://bit.ly/LsaBa", "www.baltimoreravens.com/", "kinley", "20120820"));
+      add(new Values("http://bit.ly/LsaBa", "www.baltimoreravens.com/", "kinley", "20120903")); 
     }});
   }};
   

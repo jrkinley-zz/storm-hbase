@@ -23,11 +23,11 @@ public class TupleTableConfig implements Serializable {
   public static final long DEFAULT_INCREMENT = 1L;
 
   private String tableName;
-  private String tupleRowKeyField;
-  private String tupleTimestampField;
-  private Map<String, Set<String>> columnFamilies;
+  protected String tupleRowKeyField;
+  protected String tupleTimestampField;
+  protected Map<String, Set<String>> columnFamilies;
   private boolean batch = true;
-  private boolean writeToWAL = true;
+  protected boolean writeToWAL = true;
   private long writeBufferSize = 0L;
 
   /**
@@ -266,5 +266,12 @@ public class TupleTableConfig implements Serializable {
    */
   public Set<String> getColumnFamilies() {
     return this.columnFamilies.keySet();
+  }
+
+  /**
+   * @return the tupleRowKeyField
+   */
+  public String getTupleRowKeyField() {
+    return tupleRowKeyField;
   }
 }

@@ -10,8 +10,8 @@ It provides three Bolt implementations:
 * <b><tt>HBaseCountersBolt</tt></b>: A Bolt for transforming Tuples into HBase counter Increment requests. This is useful for storm topologies that collect statistics. Please note that this is a non-transactional bolt and therefore cannot achieve exactly-once processing semantics. Based on Storm's guaranteed message processing mechanism there is a chance of over-counting if Tuples fail after updating the HBase counter and before they are successfully acked in Storm, and are subsequently replayed.
 
 * <b><tt>HBaseCounterBatchBolt</tt></b>: A transactional version of <tt>HBaseCountersBolt</tt> for incrementing idempotent counters in HBase. This Bolt is intended for use in transactional topologies, which enable you to achieve exactly once processing semantics (https://github.com/nathanmarz/storm/wiki/Transactional-topologies). It stores the counter and the latest transaction ID (txid) together in the HBase table. The counter is only incremented if the txid in the table is different from the txid of the Tuple being processed. E.g:
-** If the txids are different, because of Storm's strong ordering of transactions, we know that the current Tuple hasn't been represented in the counter, so the counter is incremented and its latest txid updated.
-** If the txids are the same, we know that the current Tuple is represented in the counter so it is skipped. The Tuple must have failed after previously incrementing the counter but before reporting success back to Storm, so it was replayed.
+If the txids are different, because of Storm's strong ordering of transactions, we know that the current Tuple hasn't been represented in the counter, so the counter is incremented and its latest txid updated.
+If the txids are the same, we know that the current Tuple is represented in the counter so it is skipped. The Tuple must have failed after previously incrementing the counter but before reporting success back to Storm, so it was replayed.
 
 All implementations are generic and configurable. The <tt>TupleTableConfig</tt> class is used to configure the Bolts with the following attributes:
 

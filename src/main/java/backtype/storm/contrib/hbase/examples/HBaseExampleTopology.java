@@ -15,7 +15,6 @@ import backtype.storm.utils.Utils;
  * <tt>create 'shorturl', {NAME => 'data', VERSIONS => 3}, {NAME => 'daily', VERSION => 1, TTL => 604800}</tt>
  */
 public class HBaseExampleTopology {
-
   /**
    * @param args
    */

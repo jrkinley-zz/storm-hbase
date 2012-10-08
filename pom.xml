@@ -37,7 +37,7 @@
 	</repositories>
 
 	<properties>
-		<storm.version>0.8.0</storm.version>
+		<storm.version>0.8.1</storm.version>
 		<hbase.version>0.92.1-cdh4.0.1</hbase.version>
 		<hadoop.version>2.0.0-cdh4.0.1</hadoop.version>
 	</properties>
@@ -67,6 +67,11 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.1</version>
 		</dependency>
 	</dependencies>
 
