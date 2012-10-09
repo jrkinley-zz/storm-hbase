@@ -7,7 +7,7 @@ The <b>storm-hbase</b> connector provides a number of Bolt and Trident State imp
 * [HBase Storm Bolts](https://github.com/jrkinley/storm-hbase/wiki/HBase-Storm-Bolts)
 * [HBase Trident](https://github.com/jrkinley/storm-hbase/wiki/HBase-Trident)
 
-The example topologies are based on the URL shortener project (Hush), taken from the <i>HBase: The Definitive Guide</i> book (http://shop.oreilly.com/product/0636920014348.do):
+The example topologies are based on the URL shortener project (Hush), taken from the <i>HBase: The Definitive Guide</i> book.
 
 ## Build
 
