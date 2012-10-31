@@ -2,7 +2,7 @@
 
 <b>storm-hbase</b> is a HBase connector for Storm (https://github.com/nathanmarz/storm/). It enables huge amounts of streaming data, and stateful representations of streaming data, to be persisted in HBase - the scalable, distributed, big data store.
 
-The connector provides a number of Bolt and Trident State implementations. It can be used for simple Storm to HBase integration and in more complex architectures, such as the “Lambda Architecture” as described by Nathan Marz:
+The connector provides a number of Bolt and Trident State implementations. It can be used for simple Storm to HBase integration and in more complex architectures, such as the "Lambda Architecture" as described by Nathan Marz:
 
 * http://www.slideshare.net/nathanmarz/runaway-complexity-in-big-data-and-a-plan-to-stop-it
 * http://www.manning.com/marz/
