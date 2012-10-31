@@ -7,7 +7,7 @@ The connector provides a number of Bolt and Trident State implementations. It ca
 * http://www.slideshare.net/nathanmarz/runaway-complexity-in-big-data-and-a-plan-to-stop-it
 * http://www.manning.com/marz/
 
-In this type of architecture the connector can be used to persist the precomputed realtime view in HBase, from which tools like Storm (DRPC) or Cloudera Impala can be used to query and merge both the realtime and batch views to present the most accurate and up-to-date information to the users.
+In this type of architecture the connector can be used to persist a precomputed realtime view in HBase. Then tools like Storm (DRPC) and Cloudera Impala can be used to query and merge the realtime and batch computed views to present the most accurate and up-to-date information to the users.
 
 Further documentation and example topologies can be found on these wiki pages:
 
