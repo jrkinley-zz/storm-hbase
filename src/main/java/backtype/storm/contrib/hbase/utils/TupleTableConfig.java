@@ -32,11 +32,8 @@ public class TupleTableConfig implements Serializable {
 
   /**
    * Initialize configuration
-   * 
-   * @param table
-   *          The HBase table name
-   * @param rowKeyField
-   *          The {@link Tuple} field used to set the rowKey
+   * @param table The HBase table name
+   * @param rowKeyField The {@link Tuple} field used to set the rowKey
    */
   public TupleTableConfig(final String table, final String rowKeyField) {
     this.tableName = table;
@@ -47,16 +44,11 @@ public class TupleTableConfig implements Serializable {
 
   /**
    * Initialize configuration
-   * 
-   * @param table
-   *          The HBase table name
-   * @param rowKeyField
-   *          The {@link Tuple} field used to set the rowKey
-   * @param timestampField
-   *          The {@link Tuple} field used to set the timestamp
+   * @param table The HBase table name
+   * @param rowKeyField The {@link Tuple} field used to set the rowKey
+   * @param timestampField The {@link Tuple} field used to set the timestamp
    */
-  public TupleTableConfig(final String table, final String rowKeyField,
-      final String timestampField) {
+  public TupleTableConfig(final String table, final String rowKeyField, final String timestampField) {
     this.tableName = table;
     this.tupleRowKeyField = rowKeyField;
     this.tupleTimestampField = timestampField;
@@ -65,11 +57,8 @@ public class TupleTableConfig implements Serializable {
 
   /**
    * Add column family and column qualifier to be extracted from tuple
-   * 
-   * @param columnFamily
-   *          The column family name
-   * @param columnQualifier
-   *          The column qualifier name
+   * @param columnFamily The column family name
+   * @param columnQualifier The column qualifier name
    */
   public void addColumn(final String columnFamily, final String columnQualifier) {
     Set<String> columns = this.columnFamilies.get(columnFamily);
@@ -84,9 +73,7 @@ public class TupleTableConfig implements Serializable {
 
   /**
    * Creates a HBase {@link Put} from a Storm {@link Tuple}
-   * 
-   * @param tuple
-   *          The {@link Tuple}
+   * @param tuple The {@link Tuple}
    * @return {@link Put}
    */
   public Put getPutFromTuple(final Tuple tuple) {
@@ -121,11 +108,8 @@ public class TupleTableConfig implements Serializable {
 
   /**
    * Creates a HBase {@link Increment} from a Storm {@link Tuple}
-   * 
-   * @param tuple
-   *          The {@link Tuple}
-   * @param increment
-   *          The amount to increment the counter by
+   * @param tuple The {@link Tuple}
+   * @param increment The amount to increment the counter by
    * @return {@link Increment}
    */
   public Increment getIncrementFromTuple(final Tuple tuple, final long increment) {
@@ -155,24 +139,18 @@ public class TupleTableConfig implements Serializable {
   }
 
   /**
-   * Increment the counter for the given family and column by the specified
-   * amount
+   * Increment the counter for the given family and column by the specified amount
    * <p>
-   * If the family and column already exist in the Increment the counter value
-   * is incremented by the specified amount rather than overridden, as it is in
-   * HBase's {@link Increment#addColumn(byte[], byte[], long)} method
-   * 
-   * @param inc
-   *          The {@link Increment} to update
-   * @param family
-   *          The column family
-   * @param qualifier
-   *          The column qualifier
-   * @param amount
-   *          The amount to increment the counter by
+   * If the family and column already exist in the Increment the counter value is incremented by the
+   * specified amount rather than overridden, as it is in HBase's
+   * {@link Increment#addColumn(byte[], byte[], long)} method
+   * @param inc The {@link Increment} to update
+   * @param family The column family
+   * @param qualifier The column qualifier
+   * @param amount The amount to increment the counter by
    */
-  public static void addIncrement(Increment inc, final byte[] family,
-      final byte[] qualifier, final Long amount) {
+  public static void addIncrement(Increment inc, final byte[] family, final byte[] qualifier,
+      final Long amount) {
 
     NavigableMap<byte[], Long> set = inc.getFamilyMap().get(family);
     if (set == null) {
@@ -204,13 +182,13 @@ public class TupleTableConfig implements Serializable {
   }
 
   /**
-   * @param batch
-   *          Whether to enable HBase's client-side write buffer. When enabled
-   *          your bolt will store put operations locally until the write buffer
-   *          is full, so they can be sent to HBase in a single RPC call. When
-   *          disabled each put operation is effectively an RPC and is sent
-   *          straight to HBase. As your bolt can process thousands of values
-   *          per second it is recommended that the write buffer is enabled.
+   * @param batch Whether to enable HBase's client-side write buffer.
+   *          <p>
+   *          When enabled your bolt will store put operations locally until the write buffer is
+   *          full, so they can be sent to HBase in a single RPC call. When disabled each put
+   *          operation is effectively an RPC and is sent straight to HBase. As your bolt can
+   *          process thousands of values per second it is recommended that the write buffer is
+   *          enabled.
    *          <p>
    *          Enabled by default
    */
@@ -219,11 +197,11 @@ public class TupleTableConfig implements Serializable {
   }
 
   /**
-   * @param writeToWAL
-   *          Sets whether to write to HBase's edit log. Setting to false will
-   *          mean fewer operations to perform when writing to HBase and hence
-   *          better performance, but changes that haven't been flushed to a
-   *          store file will be lost in the event of HBase failure
+   * @param writeToWAL Sets whether to write to HBase's edit log.
+   *          <p>
+   *          Setting to false will mean fewer operations to perform when writing to HBase and hence
+   *          better performance, but changes that haven't been flushed to a store file will be lost
+   *          in the event of HBase failure
    *          <p>
    *          Enabled by default
    */
@@ -239,16 +217,14 @@ public class TupleTableConfig implements Serializable {
   }
 
   /**
-   * @param writeBufferSize
-   *          Overrides the client-side write buffer size.
+   * @param writeBufferSize Overrides the client-side write buffer size.
    *          <p>
-   *          By default the write buffer size is 2 MB (2097152 bytes). If you
-   *          are storing larger data, you may want to consider increasing this
-   *          value to allow your bolt to efficiently group together a larger
-   *          number of records per RPC
+   *          By default the write buffer size is 2 MB (2097152 bytes). If you are storing larger
+   *          data, you may want to consider increasing this value to allow your bolt to efficiently
+   *          group together a larger number of records per RPC
    *          <p>
-   *          Overrides the write buffer size you have set in your
-   *          hbase-site.xml e.g. <code>hbase.client.write.buffer</code>
+   *          Overrides the write buffer size you have set in your hbase-site.xml e.g.
+   *          <code>hbase.client.write.buffer</code>
    */
   public void setWriteBufferSize(long writeBufferSize) {
     this.writeBufferSize = writeBufferSize;

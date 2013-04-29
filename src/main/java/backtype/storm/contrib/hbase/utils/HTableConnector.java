@@ -14,8 +14,8 @@ import backtype.storm.generated.Bolt;
 /**
  * HTable connector for Storm {@link Bolt}
  * <p>
- * The HBase configuration is picked up from the first <tt>hbase-site.xml</tt>
- * encountered in the classpath
+ * The HBase configuration is picked up from the first <tt>hbase-site.xml</tt> encountered in the
+ * classpath
  */
 @SuppressWarnings("serial")
 public class HTableConnector implements Serializable {
@@ -27,23 +27,20 @@ public class HTableConnector implements Serializable {
 
   /**
    * Initialize HTable connection
-   * 
-   * @param conf
-   *          The {@link TupleTableConfig}
+   * @param conf The {@link TupleTableConfig}
    * @throws IOException
    */
   public HTableConnector(final TupleTableConfig conf) throws IOException {
     this.tableName = conf.getTableName();
     this.conf = HBaseConfiguration.create();
 
-    LOG.info(String.format("Initializing connection to HBase table %s at %s",
-        tableName, this.conf.get("hbase.rootdir")));
+    LOG.info(String.format("Initializing connection to HBase table %s at %s", tableName,
+      this.conf.get("hbase.rootdir")));
 
     try {
       this.table = new HTable(this.conf, this.tableName);
     } catch (IOException ex) {
-      throw new IOException("Unable to establish connection to HBase table "
-          + this.tableName, ex);
+      throw new IOException("Unable to establish connection to HBase table " + this.tableName, ex);
     }
 
     if (conf.isBatch()) {
@@ -57,12 +54,10 @@ public class HTableConnector implements Serializable {
       try {
         this.table.setWriteBufferSize(conf.getWriteBufferSize());
 
-        LOG.info("Setting client-side write buffer to "
-            + conf.getWriteBufferSize());
+        LOG.info("Setting client-side write buffer to " + conf.getWriteBufferSize());
       } catch (IOException ex) {
-        LOG.error(
-            "Unable to set client-side write buffer size for HBase table "
-                + this.tableName, ex);
+        LOG.error("Unable to set client-side write buffer size for HBase table " + this.tableName,
+          ex);
       }
     }
 
@@ -70,24 +65,19 @@ public class HTableConnector implements Serializable {
     for (String cf : conf.getColumnFamilies()) {
       if (!columnFamilyExists(cf)) {
         throw new RuntimeException(String.format(
-            "HBase table '%s' does not have column family '%s'",
-            conf.getTableName(), cf));
+          "HBase table '%s' does not have column family '%s'", conf.getTableName(), cf));
       }
     }
   }
 
   /**
    * Checks to see if table contains the given column family
-   * 
-   * @param columnFamily
-   *          The column family name
+   * @param columnFamily The column family name
    * @return boolean
    * @throws IOException
    */
-  private boolean columnFamilyExists(final String columnFamily)
-      throws IOException {
-    return this.table.getTableDescriptor().hasFamily(
-        Bytes.toBytes(columnFamily));
+  private boolean columnFamilyExists(final String columnFamily) throws IOException {
+    return this.table.getTableDescriptor().hasFamily(Bytes.toBytes(columnFamily));
   }
 
   /**

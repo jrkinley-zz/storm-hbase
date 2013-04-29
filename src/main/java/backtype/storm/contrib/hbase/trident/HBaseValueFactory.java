@@ -5,6 +5,7 @@ import java.util.Map;
 import storm.trident.state.State;
 import storm.trident.state.StateFactory;
 import backtype.storm.contrib.hbase.utils.TridentConfig;
+import backtype.storm.task.IMetricsContext;
 
 /**
  * Factory for creating {@link HBaseValueState}
@@ -19,7 +20,7 @@ public class HBaseValueFactory implements StateFactory {
 
   /** {@inheritDoc} */
   @Override
-  public State makeState(Map conf, int partitionIndex, int numPartitions) {
+  public State makeState(Map conf, IMetricsContext metrics, int partitionIndex, int numPartitions) {
     return new HBaseValueState(_conf);
   }
 }

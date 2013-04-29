@@ -14,8 +14,7 @@ import backtype.storm.contrib.hbase.utils.HTableConnector;
 import backtype.storm.contrib.hbase.utils.TridentConfig;
 
 /**
- * Storm Trident state implementation for putting and getting values from a
- * HBase table
+ * Storm Trident state implementation for putting and getting values from a HBase table
  */
 @SuppressWarnings("rawtypes")
 public class HBaseValueState implements State {
@@ -31,7 +30,9 @@ public class HBaseValueState implements State {
   /** {@inheritDoc} */
   @Override
   public void beginCommit(Long txid) {
-    LOG.debug("Beginning commit for tx " + txid);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Beginning commit for tx " + txid);
+    }
     try {
       _connector = new HTableConnector(_conf);
     } catch (IOException e) {
@@ -42,13 +43,14 @@ public class HBaseValueState implements State {
   /** {@inheritDoc} */
   @Override
   public void commit(Long txid) {
-    LOG.debug("Commit tx " + txid);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Commit tx " + txid);
+    }
     _connector.close();
   }
 
   /**
    * Send the puts to HBase
-   * 
    * @param puts
    */
   public void setValuesBulk(final List<Put> puts) {
@@ -62,7 +64,6 @@ public class HBaseValueState implements State {
 
   /**
    * Retrieve gets from HBase
-   * 
    * @param gets
    * @return List of HBase results from the the given gets
    */

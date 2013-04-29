@@ -14,6 +14,7 @@ import storm.trident.state.map.OpaqueMap;
 import storm.trident.state.map.SnapshottableMap;
 import storm.trident.state.map.TransactionalMap;
 import backtype.storm.contrib.hbase.utils.TridentConfig;
+import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
 
 /**
@@ -26,10 +27,8 @@ public class HBaseAggregateFactory implements StateFactory {
   private TridentConfig config;
 
   /**
-   * @param config
-   *          The {@link TridentConfig}
-   * @param type
-   *          The {@link StateType}
+   * @param config The {@link TridentConfig}
+   * @param type The {@link StateType}
    */
   public HBaseAggregateFactory(final TridentConfig config, final StateType type) {
     this.config = config;
@@ -38,17 +37,17 @@ public class HBaseAggregateFactory implements StateFactory {
     if (config.getStateSerializer() == null) {
       config.setStateSerializer(TridentConfig.DEFAULT_SERIALZERS.get(type));
       if (config.getStateSerializer() == null) {
-        throw new RuntimeException("Unable to find serializer for state type: "
-            + type);
+        throw new RuntimeException("Unable to find serializer for state type: " + type);
       }
-      LOG.debug("Setting default serializer: "
-          + config.getStateSerializer().getClass().getName());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Setting default serializer: " + config.getStateSerializer().getClass().getName());
+      }
     }
   }
 
   /** {@inheritDoc} */
   @Override
-  public State makeState(Map conf, int partitionIndex, int numPartitions) {
+  public State makeState(Map conf, IMetricsContext metrics, int partitionIndex, int numPartitions) {
     HBaseAggregateState state = new HBaseAggregateState(config);
     CachedMap c = new CachedMap(state, config.getStateCacheSize());
 
@@ -63,9 +62,10 @@ public class HBaseAggregateFactory implements StateFactory {
       throw new RuntimeException("Unknown state type: " + type);
     }
 
-    LOG.debug("Creating new HBaseState: " + type);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Creating new HBaseState: " + type);
+    }
 
     return new SnapshottableMap(ms, new Values("$GLOBAL$"));
   }
-
 }

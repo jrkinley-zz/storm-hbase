@@ -16,13 +16,11 @@ import backtype.storm.tuple.Tuple;
 /**
  * A Storm bolt for putting data into HBase.
  * <p>
- * By default works in batch mode by enabling HBase's client-side write buffer.
- * Enabling batch mode is recommended for high throughput, but it can be
- * disabled in {@link TupleTableConfig}.
+ * By default works in batch mode by enabling HBase's client-side write buffer. Enabling batch mode
+ * is recommended for high throughput, but it can be disabled in {@link TupleTableConfig}.
  * <p>
- * The HBase configuration is picked up from the first <tt>hbase-site.xml</tt>
- * encountered in the classpath
- * 
+ * The HBase configuration is picked up from the first <tt>hbase-site.xml</tt> encountered in the
+ * classpath
  * @see TupleTableConfig
  * @see HTableConnector
  */
@@ -42,8 +40,7 @@ public class HBaseBolt implements IRichBolt {
   /** {@inheritDoc} */
   @SuppressWarnings("rawtypes")
   @Override
-  public void prepare(Map stormConf, TopologyContext context,
-      OutputCollector collector) {
+  public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
     this.collector = collector;
 
     try {
@@ -94,8 +91,7 @@ public class HBaseBolt implements IRichBolt {
   }
 
   /**
-   * @param autoAck
-   *          the autoAck to set
+   * @param autoAck the autoAck to set
    */
   public void setAutoAck(boolean autoAck) {
     this.autoAck = autoAck;

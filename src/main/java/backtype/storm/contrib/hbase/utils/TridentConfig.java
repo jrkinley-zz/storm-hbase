@@ -19,19 +19,19 @@ import com.esotericsoftware.minlog.Log;
 
 /**
  * Configuration for Storm Trident state persistence in HBase
- * 
  * @param <T>
  */
 @SuppressWarnings("serial")
 public class TridentConfig<T> extends TupleTableConfig {
   @SuppressWarnings("rawtypes")
-  public static final Map<StateType, Serializer> DEFAULT_SERIALZERS = new HashMap<StateType, Serializer>() {
-    {
-      put(StateType.NON_TRANSACTIONAL, new JSONNonTransactionalSerializer());
-      put(StateType.TRANSACTIONAL, new JSONTransactionalSerializer());
-      put(StateType.OPAQUE, new JSONOpaqueSerializer());
-    }
-  };
+  public static final Map<StateType, Serializer> DEFAULT_SERIALZERS =
+      new HashMap<StateType, Serializer>() {
+        {
+          put(StateType.NON_TRANSACTIONAL, new JSONNonTransactionalSerializer());
+          put(StateType.TRANSACTIONAL, new JSONTransactionalSerializer());
+          put(StateType.OPAQUE, new JSONOpaqueSerializer());
+        }
+      };
 
   private int stateCacheSize = 1000;
   private Serializer<T> stateSerializer;
@@ -40,16 +40,13 @@ public class TridentConfig<T> extends TupleTableConfig {
     super(table, rowKeyField);
   }
 
-  public TridentConfig(final String table, final String rowKeyField,
-      final String timestampField) {
+  public TridentConfig(final String table, final String rowKeyField, final String timestampField) {
     super(table, rowKeyField, timestampField);
   }
 
   /**
    * Creates a HBase {@link Put} from a Storm {@link TridentTuple}
-   * 
-   * @param tuple
-   *          The {@link TridentTuple}
+   * @param tuple The {@link TridentTuple}
    * @return {@link Put}
    */
   public Put getPutFromTridentTuple(final TridentTuple tuple) {
@@ -84,9 +81,7 @@ public class TridentConfig<T> extends TupleTableConfig {
 
   /**
    * Creates a HBase {@link Get} from a Storm {@link TridentTuple}
-   * 
-   * @param tuple
-   *          The {@link TridentTuple}
+   * @param tuple The {@link TridentTuple}
    * @return {@link Get}
    */
   public Get getGetFromTridentTuple(final TridentTuple tuple) {
@@ -128,9 +123,7 @@ public class TridentConfig<T> extends TupleTableConfig {
   }
 
   /**
-   * @param stateCacheSize
-   *          Sets the size of the least-recently-used (LRU) cache. <b>Default
-   *          is 1000
+   * @param stateCacheSize Sets the size of the least-recently-used (LRU) cache. <b>Default is 1000
    */
   public void setStateCacheSize(int stateCacheSize) {
     this.stateCacheSize = stateCacheSize;
@@ -144,9 +137,7 @@ public class TridentConfig<T> extends TupleTableConfig {
   }
 
   /**
-   * @param stateSerializer
-   *          Set the {@link Serializer} to use for persisting Trident state to
-   *          HBase
+   * @param stateSerializer Set the {@link Serializer} to use for persisting Trident state to HBase
    */
   public void setStateSerializer(Serializer<T> stateSerializer) {
     this.stateSerializer = stateSerializer;

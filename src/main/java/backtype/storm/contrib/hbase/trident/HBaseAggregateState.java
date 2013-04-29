@@ -9,8 +9,6 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import com.esotericsoftware.minlog.Log;
-
 import storm.trident.state.OpaqueValue;
 import storm.trident.state.Serializer;
 import storm.trident.state.StateFactory;
@@ -22,16 +20,13 @@ import backtype.storm.contrib.hbase.utils.TridentConfig;
 
 /**
  * A HBase persistentAggregate source of state for Storm Trident topologies
- * 
- * @param <T>
- *          The type of value being persisted. Either {@link OpaqueValue} or
+ * @param <T> The type of value being persisted. Either {@link OpaqueValue} or
  *          {@link TransactionalValue}
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class HBaseAggregateState<T> implements IBackingMap<T> {
   /**
-   * @param config
-   *          The {@link TridentConfig}
+   * @param config The {@link TridentConfig}
    * @return {@link StateFactory} for opaque transactional topologies
    */
   public static StateFactory opaque(TridentConfig<OpaqueValue> config) {
@@ -39,22 +34,18 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
   }
 
   /**
-   * @param config
-   *          The {@link TridentConfig}
+   * @param config The {@link TridentConfig}
    * @return {@link StateFactory} for transactional topologies
    */
-  public static StateFactory transactional(
-      TridentConfig<TransactionalValue> config) {
+  public static StateFactory transactional(TridentConfig<TransactionalValue> config) {
     return new HBaseAggregateFactory(config, StateType.TRANSACTIONAL);
   }
 
   /**
-   * @param config
-   *          The {@link TridentConfig}
+   * @param config The {@link TridentConfig}
    * @return {@link StateFactory} for non-transactional topologies
    */
-  public static StateFactory nonTransactional(
-      TridentConfig<TransactionalValue> config) {
+  public static StateFactory nonTransactional(TridentConfig<TransactionalValue> config) {
     return new HBaseAggregateFactory(config, StateType.NON_TRANSACTIONAL);
   }
 
@@ -86,7 +77,7 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
       gets.add(g.addColumn(cf, cq));
     }
 
-    Log.debug("GETS: " + gets.toString());
+    // Log.debug("GETS: " + gets.toString());
 
     Result[] results = null;
     try {
@@ -125,7 +116,7 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
       puts.add(p.add(cf, cq, cv));
     }
 
-    Log.debug("PUTS: " + puts.toString());
+    // Log.debug("PUTS: " + puts.toString());
 
     try {
       connector.getTable().put(puts);
