@@ -2,11 +2,13 @@ package backtype.storm.contrib.hbase.bolts;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
@@ -92,14 +94,13 @@ public class HBaseCountersBatchBolt extends BaseTransactionalBolt implements ICo
     Increment extInc = counters.get(newInc.getRow());
 
     if (extInc != null) {
-      // Increment already exists for row, add newInc to extInc
-      for (Entry<byte[], NavigableMap<byte[], Long>> families : newInc.getFamilyMap().entrySet()) {
-
-        for (Entry<byte[], Long> columns : families.getValue().entrySet()) {
-          TupleTableConfig.addIncrement(extInc, families.getKey(), columns.getKey(),
-            columns.getValue());
+        for (Entry<byte[], List<Cell>> families : newInc.getFamilyCellMap().entrySet()) {
+            for (Cell cell : families.getValue()) {
+                long amount = Bytes.toLong(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
+                TupleTableConfig.addIncrement(extInc, families.getKey(), cell.getQualifierArray(),
+                        amount);
+            }
         }
-      }
       counters.put(newInc.getRow(), extInc);
     } else {
       counters.put(newInc.getRow(), newInc);
@@ -122,7 +123,7 @@ public class HBaseCountersBatchBolt extends BaseTransactionalBolt implements ICo
     }
 
     for (Increment inc : counters.values()) {
-      for (Entry<byte[], NavigableMap<byte[], Long>> e : inc.getFamilyMap().entrySet()) {
+      for (Entry<byte[], NavigableMap<byte[], Long>> e : inc.getFamilyMapOfLongs().entrySet()) {
 
         for (Entry<byte[], Long> c : e.getValue().entrySet()) {
           // Get counters latest txid from table

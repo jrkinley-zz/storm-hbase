@@ -38,8 +38,8 @@
 
 	<properties>
 		<storm.version>0.8.2</storm.version>
-		<hbase.version>0.94.2-cdh4.2.1</hbase.version>
-		<hadoop.version>2.0.0-cdh4.2.1</hadoop.version>
+		<hbase.version>0.98.1-cdh5.1.0</hbase.version>
+		<hadoop.version>2.3.0-mr1-cdh5.1.0</hadoop.version>
 	</properties>
 
 	<dependencies>
@@ -50,12 +50,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hbase</groupId>
-			<artifactId>hbase</artifactId>
+			<artifactId>hbase-client</artifactId>
 			<version>${hbase.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-common</artifactId>
+			<artifactId>hadoop-client</artifactId>
 			<version>${hadoop.version}</version>
 		</dependency>
 		<dependency>

@@ -1,18 +1,21 @@
 package backtype.storm.contrib.hbase.utils;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import backtype.storm.tuple.Tuple;
+
+import javax.annotation.Nullable;
 
 /**
  * Configuration for Storm {@link Tuple} to HBase serialization.
@@ -150,21 +153,38 @@ public class TupleTableConfig implements Serializable {
    * @param amount The amount to increment the counter by
    */
   public static void addIncrement(Increment inc, final byte[] family, final byte[] qualifier,
-      final Long amount) {
+                                  final Long amount) {
 
-    NavigableMap<byte[], Long> set = inc.getFamilyMap().get(family);
-    if (set == null) {
-      set = new TreeMap<byte[], Long>(Bytes.BYTES_COMPARATOR);
+    List<Cell> origCells = inc.getFamilyCellMap().get(family);
+    if (origCells == null) {
+      origCells = new ArrayList<Cell>();
     }
 
-    // If qualifier exists, increment amount
-    Long counter = set.get(qualifier);
-    if (counter == null) {
-      counter = 0L;
-    }
-    set.put(qualifier, amount + counter);
+    // get a reversed view of the list to find the last matching cell
+    List<Cell> cells = Lists.reverse(origCells);
 
-    inc.getFamilyMap().put(family, set);
+    int cellIndex = Iterables.indexOf(cells, new Predicate<Cell>() {
+      @Override
+      public boolean apply(@Nullable Cell cell) {
+        if (CellUtil.matchingQualifier(cell, qualifier)) {
+          return true;
+        }
+        return false;
+      }
+    });
+
+    if (cellIndex < 0) {
+      inc.addColumn(family, qualifier, amount);
+    } else {
+      Cell cell = cells.get(cellIndex);
+      long counter = Bytes.toLong(cell.getValueArray(),
+              cell.getValueOffset(), cell.getValueLength());
+      //replace the last matching cell
+      cell = CellUtil.createCell(inc.getRow(), family, qualifier, cell.getTimestamp(), cell.getTypeByte(),
+              Bytes.toBytes(counter + amount));
+      cells.set(cellIndex, cell);
+      inc.getFamilyCellMap().put(inc.getRow(), origCells);
+    }
   }
 
   /**
