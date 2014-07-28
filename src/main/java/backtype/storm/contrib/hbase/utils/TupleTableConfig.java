@@ -181,7 +181,6 @@ public class TupleTableConfig implements Serializable {
       cell = CellUtil.createCell(inc.getRow(), family, qualifier, cell.getTimestamp(), cell.getTypeByte(),
               Bytes.toBytes(counter + amount));
       cells.set(cellIndex, cell);
-      inc.getFamilyCellMap().put(inc.getRow(), origCells);
     }
   }
 
