@@ -15,8 +15,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import backtype.storm.tuple.Tuple;
 
-import javax.annotation.Nullable;
-
 /**
  * Configuration for Storm {@link Tuple} to HBase serialization.
  */
@@ -165,7 +163,7 @@ public class TupleTableConfig implements Serializable {
 
     int cellIndex = Iterables.indexOf(cells, new Predicate<Cell>() {
       @Override
-      public boolean apply(@Nullable Cell cell) {
+      public boolean apply(Cell cell) {
         if (CellUtil.matchingQualifier(cell, qualifier)) {
           return true;
         }
