@@ -154,33 +154,33 @@ public class TupleTableConfig implements Serializable {
                                   final Long amount) {
 
     List<Cell> origCells = inc.getFamilyCellMap().get(family);
-    if (origCells == null) {
-      origCells = new ArrayList<Cell>();
-    }
+    if (origCells != null) {
+      // get a reversed view of the list to find the last matching cell
+      List<Cell> cells = Lists.reverse(origCells);
 
-    // get a reversed view of the list to find the last matching cell
-    List<Cell> cells = Lists.reverse(origCells);
-
-    int cellIndex = Iterables.indexOf(cells, new Predicate<Cell>() {
-      @Override
-      public boolean apply(Cell cell) {
-        if (CellUtil.matchingQualifier(cell, qualifier)) {
-          return true;
+      int cellIndex = Iterables.indexOf(cells, new Predicate<Cell>() {
+        @Override
+        public boolean apply(Cell cell) {
+          if (CellUtil.matchingQualifier(cell, qualifier)) {
+            return true;
+          }
+          return false;
         }
-        return false;
-      }
-    });
+      });
 
-    if (cellIndex < 0) {
-      inc.addColumn(family, qualifier, amount);
+      if (cellIndex < 0) {
+        inc.addColumn(family, qualifier, amount);
+      } else {
+        Cell cell = cells.get(cellIndex);
+        long counter = Bytes.toLong(cell.getValueArray(),
+                cell.getValueOffset(), cell.getValueLength());
+        //replace the last matching cell
+        cell = CellUtil.createCell(inc.getRow(), family, qualifier, cell.getTimestamp(), cell.getTypeByte(),
+                Bytes.toBytes(counter + amount));
+        cells.set(cellIndex, cell);
+      }
     } else {
-      Cell cell = cells.get(cellIndex);
-      long counter = Bytes.toLong(cell.getValueArray(),
-              cell.getValueOffset(), cell.getValueLength());
-      //replace the last matching cell
-      cell = CellUtil.createCell(inc.getRow(), family, qualifier, cell.getTimestamp(), cell.getTypeByte(),
-              Bytes.toBytes(counter + amount));
-      cells.set(cellIndex, cell);
+      inc.addColumn(family, qualifier, amount);
     }
   }
 
